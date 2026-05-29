@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sixty &amp; Glo-ing">
+<meta name="theme-color" content="#7a5c3a">
+<title>Sixty &amp; Glo-ing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#fdf6ee;--parchment:#f5ead8;--warm-tan:#e8d5b7;--sand:#d4b896;--brown:#7a5c3a;--dark-brown:#4a3520;--rust:#b8622a;--sage:#7a9070;--sage-light:#a8bb9e;--sage-bg:#eef3eb;--plum:#8b5e83;--plum-light:#c9a8c4;--plum-bg:#f5eef4;--gold:#c9962a;--gold-light:#e8c97a;--gold-bg:#fdf5e0;--teal:#4a8a7a;--teal-light:#7ab8ac;--teal-bg:#eaf4f2;--danger:#b83232;--danger-bg:#fdeaea;--text-primary:#2d1f0f;--text-secondary:#6b4f35;--text-muted:#9a7d63;--border:rgba(122,92,58,0.18);--border-strong:rgba(122,92,58,0.35);--shadow:0 2px 12px rgba(74,53,32,0.10);--radius:14px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-primary);min-height:100vh;font-size:15px;line-height:1.5}
+.app-header{background:var(--dark-brown);padding:20px 16px 16px;text-align:center;position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 20% 50%,rgba(201,150,42,0.15) 0%,transparent 60%),radial-gradient(circle at 80% 30%,rgba(122,144,112,0.12) 0%,transparent 55%)}
+.header-inner{position:relative;z-index:1}
+.party-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold-light);line-height:1.2;margin-bottom:4px}
+.party-subtitle{font-size:12px;color:var(--sand);margin-bottom:2px}
+.party-venue{font-size:11px;color:var(--text-muted);margin-bottom:14px}
+.countdown{display:flex;gap:8px;justify-content:center;margin-bottom:4px}
+.cd-unit{background:rgba(255,255,255,0.08);border:1px solid rgba(201,150,42,0.3);border-radius:var(--radius-sm);padding:8px 10px;min-width:54px;text-align:center}
+.cd-num{font-size:24px;font-weight:500;color:var(--gold-light);line-height:1}
+.cd-label{font-size:9px;color:var(--sand);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.sync-bar{background:var(--parchment);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sync-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);flex-shrink:0}
+.sync-dot.synced{background:var(--sage)}.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite}.sync-dot.error{background:var(--danger)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-setup-btn{font-size:11px;color:var(--rust);background:none;border:1px solid var(--rust);border-radius:20px;padding:3px 10px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(45,31,15,0.6);align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--cream);border-radius:var(--radius);padding:24px 20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--dark-brown);margin-bottom:8px}
+.modal p{font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6}
+.modal ol{font-size:13px;color:var(--text-secondary);padding-left:18px;margin-bottom:16px;line-height:2}
+.modal a{color:var(--rust)}
+.modal-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.modal input,.modal select,.modal textarea{width:100%;padding:10px 12px;font-size:13px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--parchment);color:var(--text-primary);font-family:'DM Sans',sans-serif;margin-bottom:12px;-webkit-appearance:none}
+.modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--brown)}
+.modal textarea{resize:vertical;min-height:72px}
+.modal-note{background:var(--gold-bg);border:1px solid rgba(201,150,42,0.3);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--dark-brown);margin-bottom:16px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;background:var(--parchment);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:54px;padding:11px 5px 9px;font-size:10px;font-weight:500;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab-btn .tab-icon{font-size:15px}
+.tab-btn.active{color:var(--brown);border-bottom-color:var(--rust)}
+.main{padding:16px;max-width:640px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--parchment);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--text-muted);margin-bottom:4px}
+.metric-val{font-size:20px;font-weight:500;color:var(--text-primary)}
+.metric-val.green{color:var(--sage)}.metric-val.red{color:var(--danger)}.metric-val.gold{color:var(--gold)}.metric-val.teal{color:var(--teal)}
+.btn{padding:9px 16px;font-size:13px;font-weight:500;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--parchment);color:var(--text-primary);cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s,transform .1s;display:inline-flex;align-items:center;gap:5px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--dark-brown);color:var(--gold-light);border-color:var(--dark-brown)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-danger{color:var(--danger);border-color:rgba(184,50,50,0.3);background:var(--danger-bg)}
+.btn-edit{color:var(--brown);border-color:var(--border-strong);background:var(--parchment)}
+.btn-ghost{background:none;border-color:transparent;color:var(--text-muted)}
+.btn-teal{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-light)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:var(--dark-brown)}
+.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-pill{padding:5px 12px;font-size:12px;border:1px solid var(--border-strong);border-radius:20px;background:none;cursor:pointer;color:var(--text-muted);font-family:'DM Sans',sans-serif}
+.filter-pill.active{background:var(--dark-brown);color:var(--gold-light);border-color:var(--dark-brown)}
+.card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.item-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.item-row:last-child{border-bottom:none;padding-bottom:0}.item-row:first-child{padding-top:0}
+.item-cb{width:20px;height:20px;flex-shrink:0;accent-color:var(--sage);cursor:pointer;margin-top:2px}
+.item-body{flex:1;min-width:0}
+.item-name{font-size:13px;color:var(--text-primary);line-height:1.4}
+.item-done .item-name{text-decoration:line-through;color:var(--text-muted)}
+.item-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.item-actions{display:flex;gap:4px;flex-shrink:0}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500}
+.badge-cat{background:var(--gold-bg);color:var(--dark-brown);border:1px solid rgba(201,150,42,0.3)}
+.badge-mariah{background:var(--sage-bg);color:var(--sage);border:1px solid var(--sage-light)}
+.badge-corina{background:var(--plum-bg);color:var(--plum);border:1px solid var(--plum-light)}
+.badge-both{background:var(--parchment);color:var(--brown);border:1px solid var(--border-strong)}
+.badge-vendor{background:var(--parchment);color:var(--text-secondary);border:1px solid var(--border);font-style:italic}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-light)}
+.due-text{font-size:10px;color:var(--text-muted)}
+.due-soon{color:var(--rust);font-weight:500}
+.add-form{background:var(--parchment);border:1px solid var(--border-strong);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row-1{margin-bottom:10px}
+.form-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 11px;font-size:13px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:white;color:var(--text-primary);font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--brown)}
+.form-textarea{resize:vertical;min-height:64px}
+.form-file{font-size:12px;color:var(--text-secondary)}
+.form-actions{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.budget-bar-wrap{margin:10px 0 6px}
+.budget-bar-track{background:var(--warm-tan);border-radius:4px;height:8px;overflow:hidden}
+.budget-bar-fill{height:100%;border-radius:4px;background:var(--sage);transition:width .4s}
+.budget-bar-fill.over{background:var(--danger)}
+.budget-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px}
+.who-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.who-card{background:var(--parchment);border-radius:var(--radius-sm);padding:10px;text-align:center;border:1px solid var(--border)}
+.who-name{font-size:10px;color:var(--text-muted);margin-bottom:3px}
+.who-amt{font-size:16px;font-weight:500}
+.expense-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.expense-item:first-child{padding-top:0}.expense-item:last-child{border-bottom:none;padding-bottom:0}
+.expense-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.expense-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.expense-amt{font-size:14px;font-weight:500;color:var(--dark-brown);flex-shrink:0}
+.expense-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.receipt-preview{max-width:100%;max-height:180px;object-fit:contain;border-radius:var(--radius-sm);margin-top:8px;border:1px solid var(--border);cursor:pointer}
+.vendor-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.vendor-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.vendor-role{font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.vendor-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--dark-brown)}
+.vendor-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.vendor-contact{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--text-secondary);margin-bottom:8px}
+.vendor-contact a{color:var(--rust);text-decoration:none}
+.vendor-notes{font-size:12px;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px;line-height:1.6}
+.toggle-confirmed{font-size:11px;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid;font-family:'DM Sans',sans-serif;font-weight:500}
+.confirmed-btn{background:var(--sage-bg);color:var(--sage);border-color:var(--sage-light)}
+.pending-btn{background:var(--parchment);color:var(--text-muted);border-color:var(--border-strong)}
+/* TIMELINE */
+.tl-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.tl-date{font-size:11px;color:var(--text-muted);min-width:48px;text-align:right;padding-top:3px;flex-shrink:0}
+.tl-spine{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.tl-dot.past{background:var(--sage)}.tl-dot.now{background:var(--rust)}.tl-dot.future{background:var(--sand);border:2px solid var(--brown)}
+.tl-line{width:1px;background:var(--border);flex:1;min-height:18px;margin-top:2px}
+.tl-text{font-size:13px;color:var(--text-primary);line-height:1.4;flex:1}
+.tl-text.past-text{color:var(--text-muted)}
+.tl-actions{display:flex;gap:4px;flex-shrink:0;margin-top:1px}
+.sched-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.sched-row:last-child{border-bottom:none}
+.sched-time{font-size:12px;font-weight:500;color:var(--brown);min-width:62px;flex-shrink:0}
+.sched-label{font-size:13px;color:var(--text-primary);flex:1}
+.sched-actions{display:flex;gap:4px;flex-shrink:0}
+/* NOTES / THREADS */
+.note-thread{background:white;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.note-root{padding:12px 14px}
+.note-root-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.note-author{font-size:11px;font-weight:500}
+.note-author.mariah{color:var(--sage)}.note-author.corina{color:var(--plum)}
+.note-text{font-size:13px;color:var(--text-primary);line-height:1.6}
+.note-date{font-size:10px;color:var(--text-muted);margin-top:4px}
+.note-replies{border-top:1px solid var(--border)}
+.note-reply{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--parchment)}
+.note-reply:last-child{border-bottom:none}
+.note-reply-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.note-reply-text{font-size:12px;color:var(--text-primary);line-height:1.5}
+.note-reply-footer{padding:8px 14px;background:var(--cream);border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.reply-input{flex:1;padding:7px 10px;font-size:12px;border:1px solid var(--border-strong);border-radius:20px;background:white;color:var(--text-primary);font-family:'DM Sans',sans-serif}
+.reply-input:focus{outline:none;border-color:var(--brown)}
+.reply-who{padding:6px 8px;font-size:12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:white;color:var(--text-primary);font-family:'DM Sans',sans-serif;-webkit-appearance:none;width:90px}
+.reply-send{padding:7px 14px;font-size:12px;background:var(--dark-brown);color:var(--gold-light);border:none;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+/* CONTRIB */
+.contrib-summary{background:var(--teal-bg);border:1px solid var(--teal-light);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.contrib-summary-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--teal);margin-bottom:12px}
+.contrib-big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.contrib-stat{background:white;border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--teal-light)}
+.contrib-stat-label{font-size:10px;color:var(--text-muted);margin-bottom:3px}
+.contrib-stat-val{font-size:18px;font-weight:500;color:var(--teal)}
+.contrib-bar-track{background:var(--warm-tan);border-radius:4px;height:6px;overflow:hidden;margin:8px 0 4px}
+.contrib-bar-fill{height:100%;border-radius:4px;background:var(--teal);transition:width .4s}
+.contrib-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.contrib-item:first-child{padding-top:0}.contrib-item:last-child{border-bottom:none;padding-bottom:0}
+.contrib-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.contrib-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.contrib-amt{font-size:14px;font-weight:500;color:var(--teal);flex-shrink:0}
+.contrib-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.loading-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--cream);align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-overlay.show{display:flex}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--warm-tan);border-top-color:var(--brown);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text-muted)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--dark-brown);color:var(--gold-light);padding:10px 20px;border-radius:20px;font-size:13px;transition:transform .3s;z-index:300;white-space:nowrap;box-shadow:var(--shadow)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.note-form-area{background:var(--parchment);border:1px solid var(--border-strong);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.info-box{background:var(--gold-bg);border:1px solid rgba(201,150,42,0.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--dark-brown);line-height:1.6}
+/* lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:var(--radius-sm)}
+.lightbox-close{position:absolute;top:16px;right:16px;color:white;font-size:28px;cursor:pointer;line-height:1;background:none;border:none}
+</style>
+</head>
+<body>
+<div class="loading-overlay show" id="loading"><div class="loading-spinner"></div><div class="loading-text">Loading party plans...</div></div>
+<div class="toast" id="toast"></div>
+
+<!-- lightbox for receipts -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
+  <img id="lightbox-img" src="" alt="Receipt">
+</div>
+
+<!-- SYNC MODAL -->
+<div class="modal-overlay" id="setup-modal">
+  <div class="modal">
+    <h2>Connect Cloud Sync</h2>
+    <p>To sync between your phone and Aunt Corina's, you need a free <strong>JSONBin.io</strong> API key.</p>
+    <ol><li>Go to <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> and sign up free</li><li>Click <strong>API Keys</strong> in the left sidebar</li><li>Copy your <strong>Master Key</strong></li><li>Paste it below and tap Save</li></ol>
+    <div class="modal-note">Share this same API key AND Bin ID with Aunt Corina so you both see the same data.</div>
+    <div class="modal-label">JSONBin Master Key</div>
+    <input type="text" id="api-key-input" placeholder="$2b$10$..." autocomplete="off" spellcheck="false">
+    <div class="modal-label">Bin ID (leave blank first time)</div>
+    <input type="text" id="bin-id-input" placeholder="Auto-generated on first save">
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveApiKeySetting()">Save &amp; Connect</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:var(--text-muted)">Working offline? The app saves locally and you can set up sync later.</p>
+  </div>
+</div>
+
+<!-- EDIT MODAL (generic) -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h2 id="edit-modal-title">Edit</h2>
+    <div id="edit-modal-body"></div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn btn-primary" id="edit-save-btn">Save changes</button>
+      <button class="btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div style="font-size:28px;line-height:1;margin-bottom:4px">🌸✨🌿</div>
+    <div class="party-title">Sixty &amp; Glo-ing</div>
+    <div class="party-subtitle" style="font-style:italic;font-family:'Playfair Display',serif;color:var(--sand)">A Hippie Birthday Bash</div>
+    <div class="party-subtitle" style="margin-top:6px">Saturday, July 11, 2026 &nbsp;·&nbsp; 7:00 PM MST</div>
+    <div class="party-venue">📍 6813 S 58th Ave, Laveen, AZ 85339</div>
+    <div class="countdown">
+      <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-label">Days</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cd-h">--</div><div class="cd-label">Hrs</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cd-m">--</div><div class="cd-label">Min</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cd-s">--</div><div class="cd-label">Sec</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="sync-bar">
+  <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-text">Not connected</span></div>
+  <button class="sync-setup-btn" onclick="openModal()" style="display:none">Setup Sync</button>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" onclick="switchTab('checklist')"><span class="tab-icon">✅</span><span>Checklist</span></button>
+  <button class="tab-btn" onclick="switchTab('budget')"><span class="tab-icon">💰</span><span>Budget</span></button>
+  <button class="tab-btn" onclick="switchTab('contrib')"><span class="tab-icon">💸</span><span>Contributions</span></button>
+  <button class="tab-btn" onclick="switchTab('vendors')"><span class="tab-icon">📋</span><span>Vendors</span></button>
+  <button class="tab-btn" onclick="switchTab('timeline')"><span class="tab-icon">📅</span><span>Timeline</span></button>
+  <button class="tab-btn" onclick="switchTab('notes')"><span class="tab-icon">💬</span><span>Notes</span></button>
+</nav>
+
+<main class="main">
+
+<!-- CHECKLIST -->
+<section id="panel-checklist" class="panel active">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total tasks</div><div class="metric-val" id="s-total">0</div></div>
+    <div class="metric-card"><div class="metric-label">Completed</div><div class="metric-val green" id="s-done">0</div></div>
+    <div class="metric-card"><div class="metric-label">Remaining</div><div class="metric-val gold" id="s-rem">0</div></div>
+    <div class="metric-card"><div class="metric-label">Progress</div><div class="metric-val" id="s-pct">0%</div></div>
+  </div>
+  <div class="add-form" id="cl-form" style="display:none">
+    <div class="form-row">
+      <div><div class="form-label">Task</div><input class="form-input" type="text" id="ci-name" placeholder="What needs to be done?"></div>
+      <div><div class="form-label">Category</div><select class="form-select" id="ci-cat"><option>Catering</option><option>Music / DJ</option><option>Venue</option><option>Decor</option><option>Photography</option><option>Cake</option><option>Invitations</option><option>Transportation</option><option>Attire</option><option>Gifts</option><option>Other</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">Assigned to</div><select class="form-select" id="ci-who"><option value="Mariah">Mariah</option><option value="Corina">Aunt Corina</option><option value="Both">Both</option></select></div>
+      <div><div class="form-label">Due date</div><input class="form-input" type="date" id="ci-due"></div>
+    </div>
+    <div class="form-row-1"><div class="form-label">Vendor / Contact</div><input class="form-input" type="text" id="ci-vendor" placeholder="Name or company (optional)"></div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="addTask()">Add task</button><button class="btn btn-ghost" onclick="hideForm('cl-form')">Cancel</button></div>
+  </div>
+  <div class="section-head"><div class="section-title">Party tasks</div><button class="btn btn-primary btn-sm" onclick="showForm('cl-form')">+ Add</button></div>
+  <div class="filter-row">
+    <button class="filter-pill active" onclick="setFilter(this,'all')">All</button>
+    <button class="filter-pill" onclick="setFilter(this,'Mariah')">Mariah</button>
+    <button class="filter-pill" onclick="setFilter(this,'Corina')">Corina</button>
+    <button class="filter-pill" onclick="setFilter(this,'pending')">Pending</button>
+    <button class="filter-pill" onclick="setFilter(this,'done')">Done</button>
+  </div>
+  <div class="card" id="cl-list"></div>
+</section>
+
+<!-- BUDGET -->
+<section id="panel-budget" class="panel">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total budget</div><div class="metric-val" id="b-budget">--</div></div>
+    <div class="metric-card"><div class="metric-label">Total spent</div><div class="metric-val gold" id="b-spent">$0</div></div>
+    <div class="metric-card"><div class="metric-label">Contributions</div><div class="metric-val teal" id="b-contrib">$0</div></div>
+    <div class="metric-card"><div class="metric-label">Still needed</div><div class="metric-val green" id="b-remain">--</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:var(--text-secondary)">Set total budget</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;color:var(--text-muted)">$</span><input class="form-input" type="number" id="budget-input" style="width:110px;padding:6px 10px" placeholder="e.g. 2000" oninput="setBudget()"></div></div>
+    <div class="budget-bar-wrap"><div class="budget-bar-track"><div class="budget-bar-fill" id="b-bar" style="width:0%"></div></div><div class="budget-bar-labels"><span>$0</span><span id="b-bar-mid">$0 spent</span><span id="b-bar-max">--</span></div></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:center" id="b-status-text"></div>
+    <div class="who-grid">
+      <div class="who-card"><div class="who-name">Mariah paid</div><div class="who-amt" style="color:var(--sage)" id="w-mariah">$0</div></div>
+      <div class="who-card"><div class="who-name">Corina paid</div><div class="who-amt" style="color:var(--plum)" id="w-corina">$0</div></div>
+      <div class="who-card"><div class="who-name">Other</div><div class="who-amt" style="color:var(--gold)" id="w-other">$0</div></div>
+    </div>
+  </div>
+  <div class="add-form" id="exp-form" style="display:none">
+    <div class="form-row">
+      <div><div class="form-label">Description</div><input class="form-input" type="text" id="ei-desc" placeholder="What was purchased?"></div>
+      <div><div class="form-label">Category</div><select class="form-select" id="ei-cat"><option>Catering</option><option>Music / DJ</option><option>Venue</option><option>Decor</option><option>Photography</option><option>Cake</option><option>Invitations</option><option>Transportation</option><option>Attire</option><option>Gifts</option><option>Other</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">Amount ($)</div><input class="form-input" type="number" id="ei-amt" placeholder="0.00" step="0.01"></div>
+      <div><div class="form-label">Paid by</div><select class="form-select" id="ei-paid"><option value="Mariah">Mariah</option><option value="Corina">Aunt Corina</option><option value="Other">Someone else</option></select></div>
+    </div>
+    <div class="form-row-1"><div class="form-label">Vendor</div><input class="form-input" type="text" id="ei-vendor" placeholder="Vendor name (optional)"></div>
+    <div class="form-row-1"><div class="form-label">Upload receipt (photo or screenshot)</div><input type="file" id="ei-receipt" accept="image/*" class="form-file"></div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="addExpense()">Add expense</button><button class="btn btn-ghost" onclick="hideForm('exp-form')">Cancel</button></div>
+  </div>
+  <div class="section-head"><div class="section-title">Expense log</div><button class="btn btn-primary btn-sm" onclick="showForm('exp-form')">+ Add</button></div>
+  <div class="card" id="exp-list"></div>
+</section>
+
+<!-- CONTRIBUTIONS -->
+<section id="panel-contrib" class="panel">
+  <div class="info-box">💸 Record every Zelle payment or cash contribution from family members here. All contributions automatically reduce what you still need to cover — see the updated "Still needed" amount on the Budget tab.</div>
+  <div class="contrib-summary">
+    <div class="contrib-summary-title">Contributions summary</div>
+    <div class="contrib-big">
+      <div class="contrib-stat"><div class="contrib-stat-label">Total collected</div><div class="contrib-stat-val" id="c-total">$0.00</div></div>
+      <div class="contrib-stat"><div class="contrib-stat-label">Contributors</div><div class="contrib-stat-val" id="c-count">0</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--teal);margin-bottom:4px">Contributions vs. party budget</div>
+    <div class="contrib-bar-track"><div class="contrib-bar-fill" id="c-bar" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)"><span id="c-bar-left">$0 collected</span><span id="c-bar-right">$0 budget</span></div>
+  </div>
+  <div class="add-form" id="contrib-form" style="display:none">
+    <div class="form-row">
+      <div><div class="form-label">Contributor name</div><input class="form-input" type="text" id="cni-name" placeholder="e.g. Grandma, Aunt Rosa..."></div>
+      <div><div class="form-label">Amount ($)</div><input class="form-input" type="number" id="cni-amt" placeholder="0.00" step="0.01"></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">How they sent it</div><select class="form-select" id="cni-method"><option>Zelle</option><option>Cash</option><option>Venmo</option><option>CashApp</option><option>Check</option><option>Other</option></select></div>
+      <div><div class="form-label">Date received</div><input class="form-input" type="date" id="cni-date"></div>
+    </div>
+    <div class="form-row-1"><div class="form-label">What it is for (optional)</div><input class="form-input" type="text" id="cni-note" placeholder="e.g. toward catering, general party fund..."></div>
+    <div class="form-row-1"><div class="form-label">Received by</div><select class="form-select" id="cni-recv"><option value="Mariah">Mariah (going to savings)</option><option value="Corina">Aunt Corina</option></select></div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="addContrib()">Record contribution</button><button class="btn btn-ghost" onclick="hideForm('contrib-form')">Cancel</button></div>
+  </div>
+  <div class="section-head"><div class="section-title">Contribution log</div><button class="btn btn-primary btn-sm" onclick="showForm('contrib-form')">+ Add</button></div>
+  <div class="card" id="contrib-list"></div>
+</section>
+
+<!-- VENDORS -->
+<section id="panel-vendors" class="panel">
+  <div class="info-box">🌿 Tap "Pending" on any vendor to mark them confirmed. Use Edit to update any details.</div>
+  <div class="add-form" id="ven-form" style="display:none">
+    <div class="form-row">
+      <div><div class="form-label">Role / Service</div><input class="form-input" type="text" id="vi-role" placeholder="DJ, Florist..."></div>
+      <div><div class="form-label">Name / Company</div><input class="form-input" type="text" id="vi-name" placeholder="Full name"></div>
+    </div>
+    <div class="form-row">
+      <div><div class="form-label">Phone</div><input class="form-input" type="tel" id="vi-phone" placeholder="(555) 000-0000"></div>
+      <div><div class="form-label">Quoted price ($)</div><input class="form-input" type="number" id="vi-quote" placeholder="0"></div>
+    </div>
+    <div class="form-row-1"><div class="form-label">Email</div><input class="form-input" type="email" id="vi-email" placeholder="email@example.com"></div>
+    <div class="form-row-1"><div class="form-label">Notes</div><textarea class="form-textarea" id="vi-notes" placeholder="Menu, deposit due, contract status..."></textarea></div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="addVendor()">Save vendor</button><button class="btn btn-ghost" onclick="hideForm('ven-form')">Cancel</button></div>
+  </div>
+  <div class="section-head"><div class="section-title">Vendor directory</div><button class="btn btn-primary btn-sm" onclick="showForm('ven-form')">+ Add</button></div>
+  <div id="ven-list"></div>
+</section>
+
+<!-- TIMELINE -->
+<section id="panel-timeline" class="panel">
+  <div class="info-box">📅 Edit or delete any milestone. Add your own custom ones too. The day-of schedule is also fully editable.</div>
+  <div class="section-head"><div class="section-title">Countdown milestones</div><button class="btn btn-teal btn-sm" onclick="openAddMilestone()">+ Add milestone</button></div>
+  <div class="card" id="tl-list"></div>
+  <div class="section-head" style="margin-top:4px"><div class="section-title">Day-of schedule</div><button class="btn btn-teal btn-sm" onclick="openAddSchedule()">+ Add time slot</button></div>
+  <div class="card" id="sched-list"></div>
+</section>
+
+<!-- NOTES -->
+<section id="panel-notes" class="panel">
+  <div class="info-box">💬 Leave notes for each other and reply in thread — just like texting. Each note has its own reply thread.</div>
+  <div class="note-form-area" id="note-form" style="display:none">
+    <div class="form-row-1"><div class="form-label">Your name</div><select class="form-select" id="ni-author"><option value="Mariah">Mariah</option><option value="Corina">Aunt Corina</option></select></div>
+    <div class="form-row-1"><div class="form-label">Note</div><textarea class="form-textarea" id="ni-text" placeholder="Add a shared note..." rows="3"></textarea></div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="addNote()">Post note</button><button class="btn btn-ghost" onclick="hideForm('note-form')">Cancel</button></div>
+  </div>
+  <div class="section-head"><div class="section-title">Shared notes</div><button class="btn btn-primary btn-sm" onclick="showForm('note-form')">+ New note</button></div>
+  <div id="notes-list"></div>
+</section>
+
+</main>
+<script>
+var STORAGE_KEY='sixty_gloing_v4',BIN_KEY_STORE='sixty_jsonbin_key',BIN_ID_STORE='sixty_jsonbin_id',JSONBIN_URL='https://api.jsonbin.io/v3/b';
+var HARDCODED_KEY='$2a$10$iOvvsDQxl.ooO5ruwMa.gOHLTh7JG0nSijUyJXUUL/7U00vqD4cAe';
+var HARDCODED_BIN='6a18f05921f9ee59d297ca0e';
+var syncTimer=null,activeFilter='all',currentTab='checklist',editingId=null,editingType=null;
+var state={budget:0,items:[],expenses:[],vendors:[],notes:[],contribs:[],milestones:[],schedule:[],_v:Date.now()};
+var nid=1;
+function uid(){return 'i'+(nid++)+'t'+Date.now();}
+
+var DEFAULT_MILESTONES=[
+  {id:'m1',date:'Jun 1',label:'Lock in chair, table and linen rental'},
+  {id:'m2',date:'Jun 10',label:'Book photographer / designate photo person'},
+  {id:'m3',date:'Jun 15',label:'Finalize RSVP count from Facebook event'},
+  {id:'m4',date:'Jun 25',label:'Order all decor - hippie/boho theme'},
+  {id:'m5',date:'Jun 27',label:'Send final head count to Yolanda Ramirez'},
+  {id:'m6',date:'Jul 1',label:'Order birthday cake - flavor and design confirmed'},
+  {id:'m7',date:'Jul 1',label:'Send song request list to Deeana'},
+  {id:'m8',date:'Jul 5',label:'Confirm all vendor arrival times and logistics'},
+  {id:'m9',date:'Jul 8',label:'Last-minute decor and balloon run'},
+  {id:'m10',date:'Jul 10',label:'Pay DJ remaining balance - $350'},
+  {id:'m11',date:'Jul 10',label:'Venue setup day - tables, decor, lighting'},
+  {id:'m12',date:'Jul 11',label:'Sixty and Glo-ing - Party Day!'}
+];
+var DEFAULT_SCHEDULE=[
+  {id:'s1',time:'4:00 PM',label:'Setup crew arrives - decor, tables, chairs'},
+  {id:'s2',time:'6:30 PM',label:'Deeana (DJ) arrives and soundcheck'},
+  {id:'s3',time:'7:00 PM',label:'Doors open - guests arrive'},
+  {id:'s4',time:'7:30 PM',label:'Mingling and cocktail hour'},
+  {id:'s5',time:'8:00 PM',label:"Gloria's grand entrance and DJ kicks off"},
+  {id:'s6',time:'8:30 PM',label:'Dinner - Yolanda taco bar service'},
+  {id:'s7',time:'9:30 PM',label:'Toasts and speeches'},
+  {id:'s8',time:'10:00 PM',label:'Cake cutting and singing'},
+  {id:'s9',time:'10:15 PM',label:'Dancing - DJ set runs to midnight'},
+  {id:'s10',time:'11:45 PM',label:'Last song and send-off'}
+];
+
+function seedData(){
+  state.items=[
+    {id:uid(),name:'Send final guest count to Yolanda (deadline June 27)',cat:'Catering',who:'Both',vendor:'Yolanda Ramirez',due:'2026-06-27',done:false},
+    {id:uid(),name:'Confirm DJ setup time, parking and logistics with Deeana',cat:'Music / DJ',who:'Mariah',vendor:'Deeana Cano Armendariz',due:'2026-07-05',done:false},
+    {id:uid(),name:'Pay DJ remaining balance of $350 via Zelle',cat:'Music / DJ',who:'Mariah',vendor:'Deeana Cano Armendariz',due:'2026-07-10',done:false},
+    {id:uid(),name:'Arrange chair, table and linen rentals',cat:'Venue',who:'Mariah',vendor:'',due:'2026-06-15',done:false},
+    {id:uid(),name:'Purchase decorations - hippie/boho theme (peace signs, flowers, earthy colors, macrame)',cat:'Decor',who:'Corina',vendor:'',due:'2026-06-25',done:false},
+    {id:uid(),name:'Order birthday cake - confirm flavor and design',cat:'Cake',who:'Corina',vendor:'',due:'2026-07-01',done:false},
+    {id:uid(),name:'Book photographer or assign a designated photo person',cat:'Photography',who:'Both',vendor:'',due:'2026-06-15',done:false},
+    {id:uid(),name:"Coordinate Mom's outfit and family attire",cat:'Attire',who:'Mariah',vendor:'',due:'2026-07-05',done:false},
+    {id:uid(),name:'Arrange guest transportation if needed',cat:'Transportation',who:'Corina',vendor:'',due:'2026-07-01',done:false},
+    {id:uid(),name:'Build song request list and send playlist to Deeana',cat:'Music / DJ',who:'Both',vendor:'Deeana Cano Armendariz',due:'2026-07-01',done:false},
+    {id:uid(),name:'Buy serving supplies - plates, cups, utensils, napkins',cat:'Catering',who:'Corina',vendor:'',due:'2026-07-01',done:false},
+    {id:uid(),name:'Set up venue the day before - decor, tables, lighting, backdrop',cat:'Decor',who:'Both',vendor:'',due:'2026-07-10',done:false},
+    {id:uid(),name:'Confirm final headcount and all vendor arrival times',cat:'Venue',who:'Mariah',vendor:'',due:'2026-07-05',done:false},
+    {id:uid(),name:'Buy birthday balloons and any last-minute decor',cat:'Decor',who:'Corina',vendor:'',due:'2026-07-08',done:false},
+  ];
+  state.vendors=[
+    {id:uid(),role:'Catering',name:'Yolanda Ramirez',phone:'(602) 488-7923',email:'',quote:'',notes:'Taco Bar: Carne Asada, Pollo Asada, Birria, Rice, Beans, Red Salsa, Green Salsa, Guacamole Salsa. Needs final head count 2 weeks before - deadline June 27.',confirmed:true},
+    {id:uid(),role:'DJ',name:'Deeana Cano Armendariz',phone:'(623) 261-4576',email:'',quote:'400',notes:'Set time: 8:00 PM to 12:00 AM. Total cost $400. $50 deposit paid via Zelle by Mariah. Remaining balance: $350 - pay before party day.',confirmed:true},
+  ];
+  state.expenses=[{id:uid(),desc:'DJ deposit - Deeana Cano Armendariz',cat:'Music / DJ',amt:50,paid:'Mariah',vendor:'Deeana Cano Armendariz',receiptUrl:''}];
+  state.notes=[
+    {id:uid(),text:'Invitations sent via Facebook event "Sixty and Glo-ing: A Hippie Birthday Bash". Direct guests to the FB event for RSVPs.',author:'Mariah',ts:Date.now()-7200000,replies:[]},
+    {id:uid(),text:"Venue is Mom's house at 6813 S 58th Ave, Laveen AZ. Theme: hippie/boho - peace signs, earthy tones, flowers, macrame. Mom's favorite flowers are white roses and hydrangeas.",author:'Corina',ts:Date.now()-3600000,replies:[]},
+  ];
+  state.contribs=[];
+  state.milestones=DEFAULT_MILESTONES.map(function(m){return {id:m.id,date:m.date,label:m.label};});
+  state.schedule=DEFAULT_SCHEDULE.map(function(s){return {id:s.id,time:s.time,label:s.label};});
+}
+
+function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}}
+function loadLocal(){try{var d=localStorage.getItem(STORAGE_KEY);if(d){state=JSON.parse(d);return true;}}catch(e){}return false;}
+function getApiKey(){return HARDCODED_KEY;}
+function getBinId(){return localStorage.getItem(BIN_ID_STORE)||HARDCODED_BIN;}
+function fixState(){
+  if(!state.notes)state.notes=[];if(!state.expenses)state.expenses=[];if(!state.vendors)state.vendors=[];if(!state.items)state.items=[];if(!state.contribs)state.contribs=[];
+  if(!state.milestones||!state.milestones.length)state.milestones=DEFAULT_MILESTONES.map(function(m){return {id:m.id,date:m.date,label:m.label};});
+  if(!state.schedule||!state.schedule.length)state.schedule=DEFAULT_SCHEDULE.map(function(s){return {id:s.id,time:s.time,label:s.label};});
+  state.notes.forEach(function(n){if(!n.replies)n.replies=[];});
+}
+function totalContribs(){return state.contribs.reduce(function(s,c){return s+(c.amt||0);},0);}
+
+function setSyncStatus(s,t){document.getElementById('sync-dot').className='sync-dot '+s;document.getElementById('sync-text').textContent=t;}
+
+async function pushToCloud(){
+  var key=getApiKey(),binId=getBinId();if(!key)return;
+  setSyncStatus('syncing','Syncing...');
+  state._v=Date.now();saveLocal();
+  try{
+    if(!binId){
+      var res=await fetch(JSONBIN_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Name':'sixty-gloing','X-Private':'false'},body:JSON.stringify(state)});
+      var data=await res.json();
+      if(data.metadata&&data.metadata.id){
+        localStorage.setItem(BIN_ID_STORE,data.metadata.id);
+        showToast('Connected! Share Bin ID with Corina: '+data.metadata.id);
+      }
+    }else{
+      var r=await fetch(JSONBIN_URL+'/'+binId,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':key},body:JSON.stringify(state)});
+      if(!r.ok)throw new Error('push failed '+r.status);
+    }
+    setSyncStatus('synced','Synced just now');
+  }catch(e){setSyncStatus('error','Sync failed — check key');console.error('push error',e);}
+}
+
+async function pullFromCloud(){
+  var key=getApiKey(),binId=getBinId();if(!key||!binId)return;
+  try{
+    var res=await fetch(JSONBIN_URL+'/'+binId+'/latest',{headers:{'X-Master-Key':key}});
+    if(!res.ok)throw new Error('pull failed '+res.status);
+    var data=await res.json();
+    if(!data.record)return;
+    var cloudV=data.record._v||0;
+    var localV=state._v||0;
+    if(cloudV>localV){
+      state=data.record;fixState();saveLocal();renderAll();
+      setSyncStatus('synced','Synced just now');
+    }else if(cloudV<localV){
+      // local is newer — push it up
+      await pushToCloud();
+    }else{
+      setSyncStatus('synced','Up to date');
+    }
+  }catch(e){setSyncStatus('error','Sync failed');console.error('pull error',e);}
+}
+
+async function forcePush(){
+  // stamps a fresh timestamp so local always wins, then pushes
+  state._v=Date.now()+1;
+  await pushToCloud();
+}
+
+function schedulePush(){if(syncTimer)clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
+
+function openModal(){document.getElementById('api-key-input').value=getApiKey();document.getElementById('bin-id-input').value=getBinId();document.getElementById('setup-modal').classList.add('open');}
+function closeModal(){document.getElementById('setup-modal').classList.remove('open');}
+function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');editingId=null;editingType=null;}
+function openLightbox(src){document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+window.saveApiKeySetting=function(){
+  var key=document.getElementById('api-key-input').value.trim();var binId=document.getElementById('bin-id-input').value.trim();
+  if(!key){alert('Please enter your JSONBin Master Key.');return;}
+  localStorage.setItem(BIN_KEY_STORE,key);if(binId)localStorage.setItem(BIN_ID_STORE,binId);
+  closeModal();setSyncStatus('syncing','Connecting...');
+  // Always force push local data first so this device's data wins, then start polling
+  forcePush().then(function(){setInterval(pullFromCloud,20000);});
+};
+
+function updateCountdown(){
+  var target=new Date('2026-07-11T19:00:00-07:00'),now=new Date(),diff=target-now;
+  if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(function(id){document.getElementById(id).textContent='🎉';});return;}
+  document.getElementById('cd-d').textContent=Math.floor(diff/86400000);
+  document.getElementById('cd-h').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+setInterval(updateCountdown,1000);updateCountdown();
+
+var TAB_NAMES=['checklist','budget','contrib','vendors','timeline','notes'];
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',TAB_NAMES[i]===t);});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('panel-'+t).classList.add('active');renderPanel(t);
+}
+function renderPanel(t){if(t==='checklist')renderChecklist();else if(t==='budget')renderBudget();else if(t==='contrib')renderContrib();else if(t==='vendors')renderVendors();else if(t==='timeline')renderTimeline();else if(t==='notes')renderNotes();}
+function renderAll(){renderPanel(currentTab);}
+function showForm(id){document.getElementById(id).style.display='block';}
+function hideForm(id){document.getElementById(id).style.display='none';}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3200);}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmt(n){return '$'+Number(n).toFixed(2);}
+function whoLabel(w){if(w==='Mariah')return '<span class="badge badge-mariah">Mariah</span>';if(w==='Corina')return '<span class="badge badge-corina">Aunt Corina</span>';return '<span class="badge badge-both">Both</span>';}
+function dueBadge(due){if(!due)return '';var today=new Date();today.setHours(0,0,0,0);var dd=new Date(due+'T00:00:00');var diff=Math.round((dd-today)/86400000);var cls=diff<=7&&diff>=0?' due-soon':'';return '<span class="due-text'+cls+'">Due '+due+(diff===0?' (today!)':diff===1?' (tomorrow!)':diff<0?' (overdue!)':'')+'</span>';}
+function fmtTs(ts){var d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+
+// CHECKLIST
+function setFilter(btn,f){activeFilter=f;document.querySelectorAll('.filter-pill').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderChecklist();}
+function renderChecklist(){
+  var done=state.items.filter(function(x){return x.done;}).length,total=state.items.length;
+  document.getElementById('s-total').textContent=total;document.getElementById('s-done').textContent=done;
+  document.getElementById('s-rem').textContent=total-done;document.getElementById('s-pct').textContent=total?Math.round(done/total*100)+'%':'0%';
+  var list=state.items.filter(function(it){
+    if(activeFilter==='Mariah')return it.who==='Mariah'||it.who==='Both';if(activeFilter==='Corina')return it.who==='Corina'||it.who==='Both';
+    if(activeFilter==='pending')return !it.done;if(activeFilter==='done')return it.done;return true;
+  });
+  var el=document.getElementById('cl-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🌿</div>No tasks here yet!</div>';return;}
+  var html='';
+  list.forEach(function(it){
+    html+='<div class="item-row'+(it.done?' item-done':'')+'"><input type="checkbox" class="item-cb" '+(it.done?'checked':'')+' onchange="toggleTask(\''+it.id+'\',this.checked)">';
+    html+='<div class="item-body"><div class="item-name">'+esc(it.name)+'</div><div class="item-meta"><span class="badge badge-cat">'+esc(it.cat)+'</span>'+whoLabel(it.who);
+    if(it.vendor)html+='<span class="badge badge-vendor">'+esc(it.vendor)+'</span>';html+=dueBadge(it.due)+'</div></div>';
+    html+='<div class="item-actions"><button class="btn btn-sm btn-edit" onclick="openEditTask(\''+it.id+'\')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTask(\''+it.id+'\')">Del</button></div></div>';
+  });
+  el.innerHTML=html;
+}
+function addTask(){
+  var name=document.getElementById('ci-name').value.trim();if(!name){showToast('Please enter a task name.');return;}
+  state.items.push({id:uid(),name:name,cat:document.getElementById('ci-cat').value,who:document.getElementById('ci-who').value,vendor:document.getElementById('ci-vendor').value.trim(),due:document.getElementById('ci-due').value,done:false});
+  ['ci-name','ci-vendor','ci-due'].forEach(function(id){document.getElementById(id).value='';});hideForm('cl-form');renderChecklist();schedulePush();showToast('Task added');
+}
+function toggleTask(id,val){var it=state.items.find(function(x){return x.id===id;});if(it){it.done=val;renderChecklist();schedulePush();}}
+function deleteTask(id){if(!confirm('Remove this task?'))return;state.items=state.items.filter(function(x){return x.id!==id;});renderChecklist();schedulePush();}
+function openEditTask(id){
+  var it=state.items.find(function(x){return x.id===id;});if(!it)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit task';
+  var cats=['Catering','Music / DJ','Venue','Decor','Photography','Cake','Invitations','Transportation','Attire','Gifts','Other'];
+  var co=cats.map(function(c){return '<option'+(c===it.cat?' selected':'')+'>'+c+'</option>';}).join('');
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Task name</div><input id="et-name" type="text" value="'+esc(it.name)+'"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Category</div><select id="et-cat">'+co+'</select></div>'+
+    '<div><div class="modal-label">Assigned to</div><select id="et-who"><option value="Mariah"'+(it.who==='Mariah'?' selected':'')+'>Mariah</option><option value="Corina"'+(it.who==='Corina'?' selected':'')+'>Aunt Corina</option><option value="Both"'+(it.who==='Both'?' selected':'')+'>Both</option></select></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Vendor</div><input id="et-vendor" type="text" value="'+esc(it.vendor||'')+'"></div>'+
+    '<div><div class="modal-label">Due date</div><input id="et-due" type="date" value="'+(it.due||'')+'"></div></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditTask;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditTask(){
+  var it=state.items.find(function(x){return x.id===editingId;});if(!it)return;
+  it.name=document.getElementById('et-name').value.trim()||it.name;it.cat=document.getElementById('et-cat').value;it.who=document.getElementById('et-who').value;it.vendor=document.getElementById('et-vendor').value.trim();it.due=document.getElementById('et-due').value;
+  closeEditModal();renderChecklist();schedulePush();showToast('Task updated');
+}
+
+// BUDGET
+function setBudget(){state.budget=parseFloat(document.getElementById('budget-input').value)||0;saveLocal();renderBudget();schedulePush();}
+function renderBudget(){
+  if(document.getElementById('budget-input')&&!document.getElementById('budget-input').value&&state.budget)document.getElementById('budget-input').value=state.budget;
+  var spent=state.expenses.reduce(function(s,e){return s+(e.amt||0);},0);var contrib=totalContribs();var rem=Math.max(0,state.budget-contrib)-spent;var pct=state.budget?Math.min(100,spent/state.budget*100):0;
+  document.getElementById('b-budget').textContent=state.budget?fmt(state.budget):'--';document.getElementById('b-spent').textContent=fmt(spent);document.getElementById('b-contrib').textContent=fmt(contrib);
+  document.getElementById('b-remain').textContent=state.budget?(rem>=0?fmt(rem):'-'+fmt(Math.abs(rem))):'--';document.getElementById('b-remain').className='metric-val '+(rem<0?'red':'green');
+  var st=document.getElementById('b-status-text');if(!state.budget){st.textContent='';}else if(rem>=0){st.textContent='On track - $'+rem.toFixed(2)+' remaining';}else{st.textContent='Over budget by $'+Math.abs(rem).toFixed(2);}
+  document.getElementById('b-bar').style.width=pct.toFixed(1)+'%';document.getElementById('b-bar').className='budget-bar-fill'+(rem<0?' over':'');
+  document.getElementById('b-bar-mid').textContent=fmt(spent)+' spent';document.getElementById('b-bar-max').textContent=state.budget?fmt(state.budget):'--';
+  var wm=state.expenses.filter(function(e){return e.paid==='Mariah';}).reduce(function(s,e){return s+e.amt;},0);var wc=state.expenses.filter(function(e){return e.paid==='Corina';}).reduce(function(s,e){return s+e.amt;},0);var wo=state.expenses.filter(function(e){return e.paid==='Other';}).reduce(function(s,e){return s+e.amt;},0);
+  document.getElementById('w-mariah').textContent=fmt(wm);document.getElementById('w-corina').textContent=fmt(wc);document.getElementById('w-other').textContent=fmt(wo);
+  var el=document.getElementById('exp-list');
+  if(!state.expenses.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">💸</div>No expenses logged yet.</div>';return;}
+  var html='';
+  state.expenses.slice().reverse().forEach(function(e){
+    var pb=e.paid==='Mariah'?'badge-mariah':e.paid==='Corina'?'badge-corina':'badge-both';
+    html+='<div class="expense-item"><div class="expense-top"><span class="expense-name">'+esc(e.desc)+'</span><span class="expense-amt">'+fmt(e.amt)+'</span></div>';
+    html+='<div class="expense-meta"><span class="badge badge-cat">'+esc(e.cat)+'</span><span class="badge '+pb+'">'+esc(e.paid)+' paid</span>';
+    if(e.vendor)html+='<span class="badge badge-vendor">'+esc(e.vendor)+'</span>';
+    html+='<button class="btn btn-sm btn-edit" onclick="openEditExpense(\''+e.id+'\')" style="padding:3px 8px">Edit</button>';
+    html+='<button class="btn btn-sm btn-danger" onclick="deleteExpense(\''+e.id+'\')" style="padding:3px 8px">Del</button></div>';
+    if(e.receiptUrl)html+='<img src="'+e.receiptUrl+'" class="receipt-preview" alt="Receipt - tap to enlarge" onclick="openLightbox(this.src)" title="Tap to enlarge">';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+function addExpense(){
+  var desc=document.getElementById('ei-desc').value.trim(),amt=parseFloat(document.getElementById('ei-amt').value);
+  if(!desc||!amt||amt<=0){showToast('Please enter a description and amount.');return;}
+  var file=document.getElementById('ei-receipt').files[0];
+  function finish(url){
+    state.expenses.push({id:uid(),desc:desc,cat:document.getElementById('ei-cat').value,amt:amt,paid:document.getElementById('ei-paid').value,vendor:document.getElementById('ei-vendor').value.trim(),receiptUrl:url});
+    ['ei-desc','ei-amt','ei-vendor'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('ei-receipt').value='';
+    hideForm('exp-form');renderBudget();schedulePush();showToast('Expense added');
+  }
+  if(file&&file.type.startsWith('image/')){var r=new FileReader();r.onload=function(ev){finish(ev.target.result);};r.readAsDataURL(file);}else{finish('');}
+}
+function deleteExpense(id){if(!confirm('Remove this expense?'))return;state.expenses=state.expenses.filter(function(x){return x.id!==id;});renderBudget();schedulePush();}
+function openEditExpense(id){
+  var e=state.expenses.find(function(x){return x.id===id;});if(!e)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit expense';
+  var cats=['Catering','Music / DJ','Venue','Decor','Photography','Cake','Invitations','Transportation','Attire','Gifts','Other'];
+  var co=cats.map(function(c){return '<option'+(c===e.cat?' selected':'')+'>'+c+'</option>';}).join('');
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Description</div><input id="ee-desc" type="text" value="'+esc(e.desc)+'"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Amount ($)</div><input id="ee-amt" type="number" value="'+e.amt+'" step="0.01"></div>'+
+    '<div><div class="modal-label">Category</div><select id="ee-cat">'+co+'</select></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Paid by</div><select id="ee-paid"><option value="Mariah"'+(e.paid==='Mariah'?' selected':'')+'>Mariah</option><option value="Corina"'+(e.paid==='Corina'?' selected':'')+'>Aunt Corina</option><option value="Other"'+(e.paid==='Other'?' selected':'')+'>Someone else</option></select></div>'+
+    '<div><div class="modal-label">Vendor</div><input id="ee-vendor" type="text" value="'+esc(e.vendor||'')+'"></div></div>'+
+    (e.receiptUrl?'<div style="margin-bottom:8px"><div class="modal-label">Current receipt</div><img src="'+e.receiptUrl+'" style="max-width:100%;max-height:120px;object-fit:contain;border-radius:8px;border:1px solid var(--border)" onclick="openLightbox(this.src)"></div>':'')+'<div style="margin-bottom:8px"><div class="modal-label">Replace receipt photo</div><input type="file" id="ee-receipt" accept="image/*" style="font-size:12px"></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditExpense;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditExpense(){
+  var e=state.expenses.find(function(x){return x.id===editingId;});if(!e)return;
+  e.desc=document.getElementById('ee-desc').value.trim()||e.desc;e.amt=parseFloat(document.getElementById('ee-amt').value)||e.amt;
+  e.cat=document.getElementById('ee-cat').value;e.paid=document.getElementById('ee-paid').value;e.vendor=document.getElementById('ee-vendor').value.trim();
+  var file=document.getElementById('ee-receipt').files[0];
+  function finish(){closeEditModal();renderBudget();schedulePush();showToast('Expense updated');}
+  if(file&&file.type.startsWith('image/')){var r=new FileReader();r.onload=function(ev){e.receiptUrl=ev.target.result;finish();};r.readAsDataURL(file);}else{finish();}
+}
+
+// CONTRIBUTIONS
+function renderContrib(){
+  var total=totalContribs(),count=state.contribs.length,pct=state.budget?Math.min(100,total/state.budget*100):0;
+  document.getElementById('c-total').textContent=fmt(total);document.getElementById('c-count').textContent=count;document.getElementById('c-bar').style.width=pct.toFixed(1)+'%';document.getElementById('c-bar-left').textContent=fmt(total)+' collected';document.getElementById('c-bar-right').textContent=state.budget?fmt(state.budget):'set budget first';
+  var el=document.getElementById('contrib-list');
+  if(!state.contribs.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">💸</div>No contributions yet. Tap + Add to log one.</div>';return;}
+  var html='';
+  state.contribs.slice().reverse().forEach(function(c){
+    var rb=c.recv==='Mariah'?'badge-mariah':'badge-corina';
+    html+='<div class="contrib-item"><div class="contrib-top"><span class="contrib-name">'+esc(c.name)+'</span><span class="contrib-amt">'+fmt(c.amt)+'</span></div>';
+    html+='<div class="contrib-meta"><span class="badge badge-teal">'+esc(c.method)+'</span><span class="badge '+rb+'">to '+esc(c.recv)+'</span>';
+    if(c.note)html+='<span class="badge badge-vendor">'+esc(c.note)+'</span>';if(c.date)html+='<span class="due-text">'+c.date+'</span>';
+    html+='<button class="btn btn-sm btn-edit" onclick="openEditContrib(\''+c.id+'\')" style="padding:3px 8px">Edit</button>';
+    html+='<button class="btn btn-sm btn-danger" onclick="deleteContrib(\''+c.id+'\')" style="padding:3px 8px">Del</button></div></div>';
+  });
+  el.innerHTML=html;
+}
+function addContrib(){
+  var name=document.getElementById('cni-name').value.trim(),amt=parseFloat(document.getElementById('cni-amt').value);
+  if(!name||!amt||amt<=0){showToast('Please enter a name and amount.');return;}
+  state.contribs.push({id:uid(),name:name,amt:amt,method:document.getElementById('cni-method').value,date:document.getElementById('cni-date').value,note:document.getElementById('cni-note').value.trim(),recv:document.getElementById('cni-recv').value});
+  ['cni-name','cni-amt','cni-date','cni-note'].forEach(function(id){document.getElementById(id).value='';});hideForm('contrib-form');renderContrib();renderBudget();schedulePush();showToast('Contribution recorded');
+}
+function deleteContrib(id){if(!confirm('Remove this contribution?'))return;state.contribs=state.contribs.filter(function(x){return x.id!==id;});renderContrib();renderBudget();schedulePush();}
+function openEditContrib(id){
+  var c=state.contribs.find(function(x){return x.id===id;});if(!c)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit contribution';
+  var ms=['Zelle','Cash','Venmo','CashApp','Check','Other'];var mo=ms.map(function(m){return '<option'+(m===c.method?' selected':'')+'>'+m+'</option>';}).join('');
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Name</div><input id="ec-name" type="text" value="'+esc(c.name)+'"></div>'+
+    '<div><div class="modal-label">Amount ($)</div><input id="ec-amt" type="number" value="'+c.amt+'" step="0.01"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Method</div><select id="ec-method">'+mo+'</select></div>'+
+    '<div><div class="modal-label">Date</div><input id="ec-date" type="date" value="'+(c.date||'')+'"></div></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">What it is for</div><input id="ec-note" type="text" value="'+esc(c.note||'')+'"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">Received by</div><select id="ec-recv"><option value="Mariah"'+(c.recv==='Mariah'?' selected':'')+'>Mariah (going to savings)</option><option value="Corina"'+(c.recv==='Corina'?' selected':'')+'>Aunt Corina</option></select></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditContrib;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditContrib(){
+  var c=state.contribs.find(function(x){return x.id===editingId;});if(!c)return;
+  c.name=document.getElementById('ec-name').value.trim()||c.name;c.amt=parseFloat(document.getElementById('ec-amt').value)||c.amt;
+  c.method=document.getElementById('ec-method').value;c.date=document.getElementById('ec-date').value;c.note=document.getElementById('ec-note').value.trim();c.recv=document.getElementById('ec-recv').value;
+  closeEditModal();renderContrib();renderBudget();schedulePush();showToast('Contribution updated');
+}
+
+// VENDORS
+function renderVendors(){
+  var el=document.getElementById('ven-list');
+  if(!state.vendors.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>No vendors yet.</div>';return;}
+  var html='';
+  state.vendors.forEach(function(v){
+    html+='<div class="vendor-card"><div class="vendor-header"><div><div class="vendor-role">'+esc(v.role)+'</div><div class="vendor-name">'+esc(v.name)+'</div></div>';
+    html+='<div class="vendor-badges">';if(v.quote)html+='<span class="badge badge-cat">$'+Number(v.quote).toLocaleString()+'</span>';
+    html+='<button class="toggle-confirmed '+(v.confirmed?'confirmed-btn':'pending-btn')+'" onclick="toggleConfirmed(\''+v.id+'\')">'+(v.confirmed?'Confirmed':'Pending')+'</button>';
+    html+='<button class="btn btn-sm btn-edit" onclick="openEditVendor(\''+v.id+'\')" style="padding:3px 8px">Edit</button>';
+    html+='<button class="btn btn-sm btn-danger" onclick="deleteVendor(\''+v.id+'\')" style="padding:3px 8px">Del</button></div></div>';
+    if(v.phone||v.email){html+='<div class="vendor-contact">';if(v.phone)html+='<a href="tel:'+v.phone+'">📞 '+esc(v.phone)+'</a>';if(v.email)html+='<a href="mailto:'+v.email+'">✉️ '+esc(v.email)+'</a>';html+='</div>';}
+    if(v.notes)html+='<div class="vendor-notes">'+esc(v.notes)+'</div>';html+='</div>';
+  });
+  el.innerHTML=html;
+}
+function addVendor(){
+  var role=document.getElementById('vi-role').value.trim(),name=document.getElementById('vi-name').value.trim();if(!role||!name){showToast('Please enter a role and name.');return;}
+  state.vendors.push({id:uid(),role:role,name:name,phone:document.getElementById('vi-phone').value.trim(),email:document.getElementById('vi-email').value.trim(),quote:document.getElementById('vi-quote').value,notes:document.getElementById('vi-notes').value.trim(),confirmed:false});
+  ['vi-role','vi-name','vi-phone','vi-quote','vi-email','vi-notes'].forEach(function(id){document.getElementById(id).value='';});hideForm('ven-form');renderVendors();schedulePush();showToast('Vendor saved');
+}
+function toggleConfirmed(id){var v=state.vendors.find(function(x){return x.id===id;});if(v){v.confirmed=!v.confirmed;renderVendors();schedulePush();showToast(v.confirmed?'Confirmed':'Marked as pending');}}
+function deleteVendor(id){if(!confirm('Remove this vendor?'))return;state.vendors=state.vendors.filter(function(x){return x.id!==id;});renderVendors();schedulePush();}
+function openEditVendor(id){
+  var v=state.vendors.find(function(x){return x.id===id;});if(!v)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit vendor';
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Role / Service</div><input id="ev-role" type="text" value="'+esc(v.role)+'"></div>'+
+    '<div><div class="modal-label">Name / Company</div><input id="ev-name" type="text" value="'+esc(v.name)+'"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px"><div><div class="modal-label">Phone</div><input id="ev-phone" type="tel" value="'+esc(v.phone||'')+'"></div>'+
+    '<div><div class="modal-label">Quoted price ($)</div><input id="ev-quote" type="number" value="'+(v.quote||'')+'"></div></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">Email</div><input id="ev-email" type="email" value="'+esc(v.email||'')+'"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">Notes</div><textarea id="ev-notes" rows="3">'+esc(v.notes||'')+'</textarea></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditVendor;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditVendor(){
+  var v=state.vendors.find(function(x){return x.id===editingId;});if(!v)return;
+  v.role=document.getElementById('ev-role').value.trim()||v.role;v.name=document.getElementById('ev-name').value.trim()||v.name;
+  v.phone=document.getElementById('ev-phone').value.trim();v.quote=document.getElementById('ev-quote').value;
+  v.email=document.getElementById('ev-email').value.trim();v.notes=document.getElementById('ev-notes').value.trim();
+  closeEditModal();renderVendors();schedulePush();showToast('Vendor updated');
+}
+
+// TIMELINE
+function renderTimeline(){
+  var now=new Date();now.setHours(0,0,0,0);var html='';
+  state.milestones.forEach(function(m,i){
+    var d=new Date(m.date+' 2026');d.setHours(0,0,0,0);var past=d<now,today=d.getTime()===now.getTime();var dc=past?'past':today?'now':'future';
+    html+='<div class="tl-item"><div class="tl-date">'+esc(m.date)+'</div>';
+    html+='<div class="tl-spine"><div class="tl-dot '+dc+'"></div>'+(i<state.milestones.length-1?'<div class="tl-line"></div>':'')+'</div>';
+    html+='<div class="tl-text'+(past?' past-text':'')+'">'+esc(m.label)+'</div>';
+    html+='<div class="tl-actions"><button class="btn btn-sm btn-edit" onclick="openEditMilestone(\''+m.id+'\')" style="padding:3px 7px;font-size:10px">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteMilestone(\''+m.id+'\')" style="padding:3px 7px;font-size:10px">Del</button></div></div>';
+  });
+  document.getElementById('tl-list').innerHTML=html||'<div class="empty-state"><div class="empty-icon">📅</div>No milestones yet.</div>';
+  var sh='';
+  state.schedule.forEach(function(s){
+    sh+='<div class="sched-row"><div class="sched-time">'+esc(s.time)+'</div><div class="sched-label">'+esc(s.label)+'</div>';
+    sh+='<div class="sched-actions"><button class="btn btn-sm btn-edit" onclick="openEditSchedule(\''+s.id+'\')" style="padding:3px 7px;font-size:10px">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule(\''+s.id+'\')" style="padding:3px 7px;font-size:10px">Del</button></div></div>';
+  });
+  document.getElementById('sched-list').innerHTML=sh||'<div class="empty-state">No schedule items yet.</div>';
+}
+function openAddMilestone(){
+  editingId=null;document.getElementById('edit-modal-title').textContent='Add milestone';
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Date (e.g. Jun 15)</div><input id="em-date" type="text" placeholder="Jun 15"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">Description</div><input id="em-label" type="text" placeholder="What needs to happen?"></div>';
+  document.getElementById('edit-save-btn').onclick=saveAddMilestone;document.getElementById('edit-modal').classList.add('open');
+}
+function saveAddMilestone(){
+  var date=document.getElementById('em-date').value.trim(),label=document.getElementById('em-label').value.trim();
+  if(!date||!label){showToast('Please fill in both fields.');return;}
+  state.milestones.push({id:uid(),date:date,label:label});closeEditModal();renderTimeline();schedulePush();showToast('Milestone added');
+}
+function openEditMilestone(id){
+  var m=state.milestones.find(function(x){return x.id===id;});if(!m)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit milestone';
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Date (e.g. Jun 15)</div><input id="em-date" type="text" value="'+esc(m.date)+'"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">Description</div><input id="em-label" type="text" value="'+esc(m.label)+'"></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditMilestone;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditMilestone(){
+  var m=state.milestones.find(function(x){return x.id===editingId;});if(!m)return;
+  m.date=document.getElementById('em-date').value.trim()||m.date;m.label=document.getElementById('em-label').value.trim()||m.label;
+  closeEditModal();renderTimeline();schedulePush();showToast('Milestone updated');
+}
+function deleteMilestone(id){if(!confirm('Remove this milestone?'))return;state.milestones=state.milestones.filter(function(x){return x.id!==id;});renderTimeline();schedulePush();}
+function openAddSchedule(){
+  editingId=null;document.getElementById('edit-modal-title').textContent='Add time slot';
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Time (e.g. 6:00 PM)</div><input id="es-time" type="text" placeholder="6:00 PM"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">What is happening</div><input id="es-label" type="text" placeholder="Description..."></div>';
+  document.getElementById('edit-save-btn').onclick=saveAddSchedule;document.getElementById('edit-modal').classList.add('open');
+}
+function saveAddSchedule(){
+  var time=document.getElementById('es-time').value.trim(),label=document.getElementById('es-label').value.trim();
+  if(!time||!label){showToast('Please fill in both fields.');return;}
+  state.schedule.push({id:uid(),time:time,label:label});closeEditModal();renderTimeline();schedulePush();showToast('Time slot added');
+}
+function openEditSchedule(id){
+  var s=state.schedule.find(function(x){return x.id===id;});if(!s)return;editingId=id;
+  document.getElementById('edit-modal-title').textContent='Edit time slot';
+  document.getElementById('edit-modal-body').innerHTML=
+    '<div style="margin-bottom:8px"><div class="modal-label">Time</div><input id="es-time" type="text" value="'+esc(s.time)+'"></div>'+
+    '<div style="margin-bottom:8px"><div class="modal-label">What is happening</div><input id="es-label" type="text" value="'+esc(s.label)+'"></div>';
+  document.getElementById('edit-save-btn').onclick=saveEditSchedule;document.getElementById('edit-modal').classList.add('open');
+}
+function saveEditSchedule(){
+  var s=state.schedule.find(function(x){return x.id===editingId;});if(!s)return;
+  s.time=document.getElementById('es-time').value.trim()||s.time;s.label=document.getElementById('es-label').value.trim()||s.label;
+  closeEditModal();renderTimeline();schedulePush();showToast('Time slot updated');
+}
+function deleteSchedule(id){if(!confirm('Remove this time slot?'))return;state.schedule=state.schedule.filter(function(x){return x.id!==id;});renderTimeline();schedulePush();}
+
+// NOTES WITH REPLIES
+function renderNotes(){
+  var el=document.getElementById('notes-list');
+  if(!state.notes.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">💬</div>No notes yet. Start the conversation!</div>';return;}
+  var html='';
+  state.notes.slice().reverse().forEach(function(n){
+    var isC=n.author==='Corina';
+    html+='<div class="note-thread">';
+    html+='<div class="note-root">';
+    html+='<div class="note-root-header"><div class="note-author '+(isC?'corina':'mariah')+'">'+esc(n.author)+'</div>';
+    html+='<div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;color:var(--text-muted)">'+fmtTs(n.ts)+'</span>';
+    html+='<button class="btn btn-sm btn-danger" onclick="deleteNote(\''+n.id+'\')" style="padding:2px 7px;font-size:10px">Del</button></div></div>';
+    html+='<div class="note-text">'+esc(n.text)+'</div></div>';
+    if(n.replies&&n.replies.length){
+      html+='<div class="note-replies">';
+      n.replies.forEach(function(r,ri){
+        var isRC=r.author==='Corina';
+        html+='<div class="note-reply">';
+        html+='<div class="note-reply-header"><span class="note-author '+(isRC?'corina':'mariah')+'" style="font-size:11px">'+esc(r.author)+'</span>';
+        html+='<div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;color:var(--text-muted)">'+fmtTs(r.ts)+'</span>';
+        html+='<button class="btn btn-sm btn-danger" onclick="deleteReply(\''+n.id+'\','+ri+')" style="padding:1px 6px;font-size:10px">Del</button></div></div>';
+        html+='<div class="note-reply-text">'+esc(r.text)+'</div></div>';
+      });
+      html+='</div>';
+    }
+    html+='<div class="note-reply-footer">';
+    html+='<select class="reply-who" id="reply-who-'+n.id+'"><option value="Mariah">Mariah</option><option value="Corina">Aunt Corina</option></select>';
+    html+='<input class="reply-input" type="text" id="reply-input-'+n.id+'" placeholder="Reply..." onkeydown="if(event.key===\'Enter\')sendReply(\''+n.id+'\')">';
+    html+='<button class="reply-send" onclick="sendReply(\''+n.id+'\')">Send</button>';
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+function addNote(){
+  var text=document.getElementById('ni-text').value.trim();if(!text){showToast('Please write something first.');return;}
+  state.notes.push({id:uid(),text:text,author:document.getElementById('ni-author').value,ts:Date.now(),replies:[]});
+  document.getElementById('ni-text').value='';hideForm('note-form');renderNotes();schedulePush();showToast('Note posted');
+}
+function deleteNote(id){if(!confirm('Remove this note and all its replies?'))return;state.notes=state.notes.filter(function(x){return x.id!==id;});renderNotes();schedulePush();}
+function sendReply(noteId){
+  var input=document.getElementById('reply-input-'+noteId);var who=document.getElementById('reply-who-'+noteId);var text=input.value.trim();if(!text)return;
+  var n=state.notes.find(function(x){return x.id===noteId;});if(!n)return;if(!n.replies)n.replies=[];
+  n.replies.push({author:who.value,text:text,ts:Date.now()});input.value='';renderNotes();schedulePush();showToast('Reply sent');
+}
+function deleteReply(noteId,replyIdx){if(!confirm('Remove this reply?'))return;var n=state.notes.find(function(x){return x.id===noteId;});if(!n||!n.replies)return;n.replies.splice(replyIdx,1);renderNotes();schedulePush();}
+
+(function init(){
+  var hadData=loadLocal();if(!hadData||!state.items||!state.items.length){seedData();saveLocal();}fixState();
+  var allIds=[].concat(state.items,state.expenses,state.vendors,state.notes,state.contribs,state.milestones,state.schedule).map(function(x){return parseInt((x.id||'').replace(/\D/g,''))||0;});
+  nid=Math.max(1,Math.max.apply(null,allIds.length?allIds:[0]))+1;
+  renderChecklist();renderTimeline();
+  // Key and Bin are hardcoded — always connect automatically
+  setSyncStatus('syncing','Connecting...');
+  pullFromCloud().then(function(){setInterval(pullFromCloud,20000);});
+  document.getElementById('loading').classList.remove('show');
+})();
+</script>
+</body>
+</html>
